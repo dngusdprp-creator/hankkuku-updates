@@ -86,3 +86,10 @@
 - **R178 격리 검증:** 22/22 PASS. 소스/해시/버전/AppId/영수증 검사, R172 소스·Inno 재사용, 신규 Worker/구 원복 Worker 분리, 위조 증거 거부, 링크 거부, 서명 없는 임의 데이터 변조 거부 테스트. 개발자 Windows GUI/Inno 빌드는 아직 미실행.
 - **R178 패키지:** `HKK_R178_01424_PATCHED_WORKER_BUILD_ONLY.zip` SHA256 `dcb4e4a3293a0b435395eeb711a82aecace2b30e4e2170163326d41844f8a3b2`; R172 원본 ZIP 보존, R178 실행기·테스트·구조 감사 문서 포함. Windows에서 실행하더라도 설치/서명/릴리스 공개는 하지 않음.
 - **해결되지 않은 필수 조건:** 개발자 PC용 독립 **R26 서명 1회 전환 브리지**를 구현·검증해야 기존 GUI/Worker 신뢰 체인을 훼손하지 않고 다음 버전으로 실제 설치 가능. 작업자를 위한 별도 승인과 Windows 재시작/중단 원복 E2E가 필요. 사용자 PC v0.14.19 HTTP 415는 별도 최초 전환. `--preflight PASS`는 실제 설치 성공이 아님.
+
+## R178 Windows PASS 및 R26 서명 안전 진행 (2026-11-12 KST)
+- 사용자 Windows R178 결과: `R178_PACKAGE_SOURCE_PINS=PASS_3`, `R178_PROJECT_DISCOVERY=PASS_R171_R172_ONE`, 22/22 계약 시험 PASS, 131개 소스, `PASS_BUILT_01424_CANDIDATE_NOT_PUBLISHED`.
+- 0.14.24 GUI SHA256 `86c14997f36457b30aa1f3d04a682a4cc585f42298fe5875d23a4a6f8faf409e`. Setup SHA256 `23f4eafbdb901d3eced5404333860a2166f21d9aed26a8bf4d9ab8e71dc53cf5` (170587495 bytes). 새 Worker SHA256 `93bb1c1bf92ed655ca146b550a24128fb0adc105e5462cba2f1d7e4f2b9d1171`, 원복 Worker SHA256 `68ff565f8d0efe46713e119ed1cd33556420e58fc720802466627440a51e0784`.
+- **아직 불충분:** `RELEASE_SIGNED=NO`, `INSTALL=NOT_EXECUTED`, `GITHUB_PUBLISHED=NO`, `GUI_BUTTON_E2E=NOT_TESTED`, `BOOTSTRAP=NOT_YET_IMPLEMENTED`.
+- R179 다음 단계: 새 빌드/다운로드 없이 **기존 R178 ZIP**의 고정 SHA 검증 → 실제 R178 GUI/Inno SHA/크기 확인 → R172에서 재사용한 R26 `sign_documents()`를 기존 `_r26_crypto_env\Scripts\python.exe`에서 `--mode sign --allow-sign` 사용해 **개발자 로컬에서만** 서명 → R78 새 Worker/R96 구 Worker/5개 자산 개별 SHA 및 R23 verify 검사. 개인키 암호는 로컬 비에코 프롬프트만, 레포나 결과로 유출 금지.
+- 서명은 설치/게시를 승인하지 않음. 기존 설치본 R71/R78 old Worker handoff를 변경 없이 우회할 수 없으므로 **별도 R26 서명 권한과 원복 E2E가 있는 최초 전환 브리지** 실증 전 GUI 버튼 자동 업데이트 미완료. 이슈 OPEN 유지.
