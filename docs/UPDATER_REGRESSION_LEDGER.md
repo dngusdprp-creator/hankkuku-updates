@@ -77,3 +77,12 @@
 - **패키지:** `HKK_R177_FIX1_PROJECT_DISCOVERY_ONECLICK.zip`, SHA256 `08c849e3a1aab67996dec5bdb73f9073ba875edeaff49b315220b1e72ff16e9e`, 64,371 bytes. 소스/실행기 무결성 핀 포함.
 - **현재:** Windows 실행/실제 후보 Worker 빌드/GUI 버튼 E2E/원복 여전히 NOT_TESTED. 기존 운영 프로그램/데이터/서명/레지스트리 NO_CHANGE. 개발자 Windows 실행 영수증 확인 전 ISSUE #3 CLOSE 금지.
 - **재발 방지 불변 규칙:** Windows 사용자의 프로젝트/문서 경로 하드코딩 금지. 이미 검증된 프로젝트 디스커버리 경로 재사용, 서명/설치 증빙으로 고유 소스 선택, 실제 Windows 진입 전에 renamed/redirected 문서 경로의 격리 시험. 매번 ZIP+SHA+원클릭 PowerShell 명령을 함께 제공.
+
+## R177 FIX1 Windows PASS 및 R178 새 Worker 포함 후보 준비 (2026-11-12 KST)
+- **R177 개발자 Windows 실증 확정:** `R177_SOURCE_PIN=PASS_14`, `R177_ORIGINAL_INSTALLED=PASS_01422`, `R177_STAGE_ASSETS=PASS_01423`, `R177_PROJECT_DISCOVERY=PASS_R171_R172`, `R177_CANDIDATE_IDENTITY=PASS`, `R177_CANDIDATE_SIGNED_PREFLIGHT=PASS_01422_TO_01423`, `R177_INSTALLED_UNCHANGED=PASS`. Windows 빌드된 Worker SHA256 `93bb1c1bf92ed655ca146b550a24128fb0adc105e5462cba2f1d7e4f2b9d1171`. 서명/설치/GUI 버튼 E2E는 미실행.
+- **추가로 발견한 구조상 차단:** R176 `hkk_r81_gui_handoff.handoff_gui()`는 설치된 기존 Worker를 복제하고 `plan.current_worker_sha256`과 비교. `hkk_r81_worker_main.signed_handoff()` 또한 티켓 Worker SHA와 `verified.current_worker_sha256` 일치를 요구. R177 새 Worker를 기존 0.14.22 GUI의 실행 티켓에 강제로 대체하는 방식은 불허된다. 이 보호는 의도된 신뢰 검사이며 해제하지 않는다.
+- **기존 공개 0.14.23 재사용 한계:** 공개 Inno/R78은 기존 Worker SHA를 그대로 대상으로 서명했으므로 단순 0.14.23 설치가 이후 uninsNNN 수정 Worker를 영구 배포하는 길은 아님. 공개 태그/자산은 불변 유지.
+- **R178 신규 제안/코드:** 검증된 R172 0.14.22 기반 PyInstaller/Inno/R26 서명 준비 소스 최소 재사용, **새 0.14.24 서명 전 설치 후보**를 빌드. 현재 0.14.22 Worker SHA `68ff565f8d0efe46713e119ed1cd33556420e58fc720802466627440a51e0784`은 R96 원복 대상에 남김. 새 Worker SHA `93bb1c1bf92ed655ca146b550a24128fb0adc105e5462cba2f1d7e4f2b9d1171`는 새 Inno 및 R78 목표로 사용. 설치된 0.14.22 GUI/Worker, 데이터·서명·레지스트리 무변경.
+- **R178 격리 검증:** 22/22 PASS. 소스/해시/버전/AppId/영수증 검사, R172 소스·Inno 재사용, 신규 Worker/구 원복 Worker 분리, 위조 증거 거부, 링크 거부, 서명 없는 임의 데이터 변조 거부 테스트. 개발자 Windows GUI/Inno 빌드는 아직 미실행.
+- **R178 패키지:** `HKK_R178_01424_PATCHED_WORKER_BUILD_ONLY.zip` SHA256 `dcb4e4a3293a0b435395eeb711a82aecace2b30e4e2170163326d41844f8a3b2`; R172 원본 ZIP 보존, R178 실행기·테스트·구조 감사 문서 포함. Windows에서 실행하더라도 설치/서명/릴리스 공개는 하지 않음.
+- **해결되지 않은 필수 조건:** 개발자 PC용 독립 **R26 서명 1회 전환 브리지**를 구현·검증해야 기존 GUI/Worker 신뢰 체인을 훼손하지 않고 다음 버전으로 실제 설치 가능. 작업자를 위한 별도 승인과 Windows 재시작/중단 원복 E2E가 필요. 사용자 PC v0.14.19 HTTP 415는 별도 최초 전환. `--preflight PASS`는 실제 설치 성공이 아님.
