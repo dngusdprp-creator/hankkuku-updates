@@ -53,3 +53,17 @@
 ## 적용 방식
 
 이 장부는 릴리스 준비·수정 전 가장 먼저 확인할 체크리스트다. 미래 채팅 모델의 자동 읽기를 보장하지 않으므로 관련 Issue의 상단에도 링크를 남기고, 새 패치 요청 시 명시적으로 이 파일을 기준으로 작업한다. 문제가 재발하면 새 FAIL 사례와 재현 입력을 추가하고 기존 항목을 삭제하지 않는다.
+
+
+## R176 소스 수정 후보 (2026-11-12, Windows 적용 전)
+- **상태:** ISOLATED_SOURCE_CANDIDATE / **운영 적용 NO**, 실제 자동설치 E2E **NOT_TESTED**. Issue #3 미종결.
+- **원인 재현:** R175 HKCU(64/32) `unins001.exe`, 기존 `hkk_r81_real_inno.py` `'unins000.exe' in uninstall` 고정 검사로 R174 Worker exit 7.
+- **추가 예방:** `hkk_r100_windows_guard.py`의 경쟁 제거기 감지도 `unins000/001` 고정 → 정규식 `unins[0-9]{3,}\\.exe`로 확장. 업데이트 후 `unins002.exe` 등을 놓치지 않음.
+- **변경 파일 2개 (원본→후보 SHA256):**
+  - `hkk_r81_real_inno.py`: `a85b7eeb6616890ad86f8dca0ddbd654b598a0bce17a7b4d443d91f799a7e863` → `07990bef18ead68f9ca0fa0ae0c247623042bc6eb8651bffead5c3993d074c5c`
+  - `hkk_r100_windows_guard.py`: `e1c7d6d10eb2bfd6bbf896c76eecc3a5edab46531bf8ab06b4f893c34056469c` → `453977bd3d6bc2239460d5327d429aa726e82cfb10548597cdb0574ba52a8a4e`.
+- **변경 방식:** 정확한 Inno 제거 EXE 경로·설치 루트·존재/MZ·비정션·두 Registry 뷰 일치·HKCU 등록 검사. 권한/서명 검증 해제 없음; 기존 12개 신뢰 모듈 바이트 동일.
+- **검증:** synthetic fake Windows registry, 실제 R175 입력, 정상 `unins000/001/002`, 경로 끝 역슬래시, 위조 파일·외부 경로·명령 주입·HKLM·WOW64 불일치 거부, R79 체크 연결, R100 경쟁 프로세스 → **22/22 PASS**; 14/14 Python 문법 PASS; ZIP 내부 해시 검사 PASS.
+- **ZIP 이름/해시:** `HKK_R176_REGISTRY_INNO_WORKER_SOURCE_FIX_READONLY.zip`, SHA256 `0e072ce86b9f5fe4060566ea6df77c65cc98fa98291c418c9270680e60bfa024`. 이 파일은 채팅 작업 공간 산출물로, GitHub Release에 게시한 것이 아님.
+- **다음 필수:** 개발자 PC에서 ZIP 내 R176 읽기 전용 스크립트로 **실제 Registry64/32와 R171 signed baseline 및 R173 staged 0.14.23** 기반 소스 preflight 검증. PASS 후 별도 frozen Worker 후보 빌드/안전 이전 경로 설계. 운영 Worker는 이 단계에서 여전히 `68ff565f...`이며 교체하지 않음.
+- **주의:** PowerShell 5.1 실제 구동은 미검증. Windows 코드가 새로운 BLOCKED를 보고하면 사유를 GitHub에 기록하고 새 FIX 번호부터 만들지 않는다.
