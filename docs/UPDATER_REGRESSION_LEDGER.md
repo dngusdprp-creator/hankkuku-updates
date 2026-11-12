@@ -30,6 +30,7 @@
 | HKK-U-009 | v0.14.22→0.14.23 원클릭 | R174 Worker `BLOCKED / WorkerBlocked_REGISTRY_ROOT_APPID_NOT_MATCHED`; R175 HKCU 64/32 동일 설치 경로, Inno 정보 존재, `UninstallString`의 실제 제거 파일은 `unins001.exe` | **소스 확정:** `hkk_r81_real_inno.registry_entries()`가 `'unins000.exe' in uninstall`을 강제하고 `is_inno=False`로 판정; `hkk_r79_worker.check_registry()`→`hkk_r77_identity.registry_match()`가 거부. 반드시 실제 Inno 제거기 이름·정확한 설치 루트·파일 존재·HKCU AppId·레지스트리 고유성을 검사하도록 수정 | **OPEN / 가장 먼저 해결** |
 | HKK-U-010 | v0.14.22→v0.14.23 | 0.14.23 R26 서명·GitHub 공개 PASS. Stage 6개 존재. 실제 설치는 R174에서 차단 | 배포 PASS≠원클릭 E2E PASS. 다시 업로드·신규 버전 생성하지 말고 Worker registry 소스 수정 및 격리 회귀 시험 | OPEN |
 | HKK-U-011 | 사용자 PC v0.14.19 | 초기 HTTP 415 구버전 자체에 잔존, 최초 자동 전환 미실증 | 기존 사용자 DB/Google Drive·레이아웃 보존을 전제로 최초 전환 계약 별도 설계. 사용자에게 직접 ZIP/PowerShell을 요구하는 방식은 원칙적으로 지양 | OPEN |
+| HKK-U-012 | R177 후보 Worker 격리 빌드 | R177 소스14/14·설치본 0.14.22·stage 0.14.23 모두 PASS 후 `DIR_MISSING_OR_REPARSE__release_candidates`로 BLOCKED | **소스 확정:** R177이 `Path.home()/Documents/한꾸꾸...` 경로를 하드코딩하여, 이미 정상 작동한 R172의 Windows `MyDocuments`+R171/R172 영수증 기반 프로젝트 발견 방식을 재사용하지 않음. 실제 사용자 문서 루트/프로젝트명이 다른지 Windows 재확인 필요. FIX1: R172 탐색 재사용 + 고유 1개/비링크/증빙 PASS 조건을 파이썬에서도 이중 검증. 프로젝트명 변경·공백·결측·위조 영수증·링크 테스트 10/10 PASS, 기존 R177 10/10 PASS | **FIX1 오프라인 PASS / Windows 후보 빌드 미검증** |
 
 ## R175 — 확정된 차단의 코드 체인
 
@@ -67,3 +68,12 @@
 - **ZIP 이름/해시:** `HKK_R176_REGISTRY_INNO_WORKER_SOURCE_FIX_READONLY.zip`, SHA256 `0e072ce86b9f5fe4060566ea6df77c65cc98fa98291c418c9270680e60bfa024`. 이 파일은 채팅 작업 공간 산출물로, GitHub Release에 게시한 것이 아님.
 - **다음 필수:** 개발자 PC에서 ZIP 내 R176 읽기 전용 스크립트로 **실제 Registry64/32와 R171 signed baseline 및 R173 staged 0.14.23** 기반 소스 preflight 검증. PASS 후 별도 frozen Worker 후보 빌드/안전 이전 경로 설계. 운영 Worker는 이 단계에서 여전히 `68ff565f...`이며 교체하지 않음.
 - **주의:** PowerShell 5.1 실제 구동은 미검증. Windows 코드가 새로운 BLOCKED를 보고하면 사유를 GitHub에 기록하고 새 FIX 번호부터 만들지 않는다.
+
+## R177 최초 실패 → FIX1 경로 발견 회귀 (2026-11-12 KST)
+- **Windows 사용자 관찰:** `R177_SOURCE_PIN=PASS_14`, `R177_ORIGINAL_INSTALLED=PASS_01422`, `R177_STAGE_ASSETS=PASS_01423` 이후 `R177_RESULT=BLOCKED`, `R177_REASON=DIR_MISSING_OR_REPARSE__release_candidates`, `R177_STAGE_BLOCKED_EXIT_1`. Worker 빌드, 사전검사, 설치 모두 미실행.
+- **코드에서 확인한 원인:** 기존 R177 `BUILD_R177_PATCHED_WORKER.py`가 `Path.home()/'Documents'/'한꾸꾸_부동 산_분석_시스템_V0.3'`로 프로젝트명을 고정. 반면 실전 PASS했던 R172의 `HKK_R172_RUN.ps1`는 `[Environment]::GetFolderPath('MyDocuments')`에서 `R165.../R171_RESULT.txt` 근거로 프로젝트를 정확히 하나 발견. **실제 Windows 경로가 무엇인지 로그만으로 확정 불가**, 그러나 고정 경로 가정과 R172 계약 불일치는 소스에서 확정.
+- **원천 개선:** R177 FIX1은 R172의 Windows 문서 경로 탐색 + `R171_RESULT.txt`/`R172_RESULT.txt` 근거를 재사용. 0개/2개 이상이면 BLOCKED, 링크/정션과 서명 성공 증빙 누락 거부. Python은 외부 `--project`를 필수로 받고 다시 증빙 검사, `Path.home()/Documents/고정이름` 제거. 설치 경로·R26/R71/R78·old/new SHA 검증은 그대로 유지.
+- **시험:** 기존 10/10 + FIX1 신규 10/10 PASS (로컬 격리, Windows 실증 아님). ZIP 내 원본 R176 SHA `0e072ce86b9f5fe4060566ea6df77c65cc98fa98291c418c9270680e60bfa024` 변경 없음.
+- **패키지:** `HKK_R177_FIX1_PROJECT_DISCOVERY_ONECLICK.zip`, SHA256 `08c849e3a1aab67996dec5bdb73f9073ba875edeaff49b315220b1e72ff16e9e`, 64,371 bytes. 소스/실행기 무결성 핀 포함.
+- **현재:** Windows 실행/실제 후보 Worker 빌드/GUI 버튼 E2E/원복 여전히 NOT_TESTED. 기존 운영 프로그램/데이터/서명/레지스트리 NO_CHANGE. 개발자 Windows 실행 영수증 확인 전 ISSUE #3 CLOSE 금지.
+- **재발 방지 불변 규칙:** Windows 사용자의 프로젝트/문서 경로 하드코딩 금지. 이미 검증된 프로젝트 디스커버리 경로 재사용, 서명/설치 증빙으로 고유 소스 선택, 실제 Windows 진입 전에 renamed/redirected 문서 경로의 격리 시험. 매번 ZIP+SHA+원클릭 PowerShell 명령을 함께 제공.
