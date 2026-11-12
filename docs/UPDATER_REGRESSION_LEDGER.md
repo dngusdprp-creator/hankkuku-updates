@@ -93,3 +93,10 @@
 - **아직 불충분:** `RELEASE_SIGNED=NO`, `INSTALL=NOT_EXECUTED`, `GITHUB_PUBLISHED=NO`, `GUI_BUTTON_E2E=NOT_TESTED`, `BOOTSTRAP=NOT_YET_IMPLEMENTED`.
 - R179 다음 단계: 새 빌드/다운로드 없이 **기존 R178 ZIP**의 고정 SHA 검증 → 실제 R178 GUI/Inno SHA/크기 확인 → R172에서 재사용한 R26 `sign_documents()`를 기존 `_r26_crypto_env\Scripts\python.exe`에서 `--mode sign --allow-sign` 사용해 **개발자 로컬에서만** 서명 → R78 새 Worker/R96 구 Worker/5개 자산 개별 SHA 및 R23 verify 검사. 개인키 암호는 로컬 비에코 프롬프트만, 레포나 결과로 유출 금지.
 - 서명은 설치/게시를 승인하지 않음. 기존 설치본 R71/R78 old Worker handoff를 변경 없이 우회할 수 없으므로 **별도 R26 서명 권한과 원복 E2E가 있는 최초 전환 브리지** 실증 전 GUI 버튼 자동 업데이트 미완료. 이슈 OPEN 유지.
+
+## R179 Windows 로컬 서명 실증 → R180 최초 전환 신뢰 자료 검사 (2026-11-12 KST)
+- **R179 사용자 Windows 로그+첨부 영수증:** `R178_MODE=sign`, `R178_R26_ED25519_SIGNATURE=PASS_LOCALLY_VERIFIED`, `R178_R23_MANIFEST_VERIFY=PASS_OFFLINE`, `R178_RELEASE_ASSET_COUNT=5`, `R179_R78_R96_WORKER_BINDING=PASS`, `R179_RESULT=PASS_SIGNED_CANDIDATE_ONLY`. 기존 0.14.22 파일·개인키 반출·설치·GitHub 공개 모두 NO. 원본 GUI/Worker/Setup 및 새 후보 SHA는 R178 기록 유지.
+- **R180 신규 작업:** 새 빌드/재서명/공개 없이 R179 0.14.24 서명 후보의 **실제 Windows 읽기 전용 이중 인증**. 기존 R176 정확한 14개 신뢰 모듈 ZIP SHA `0e072ce86b9f5fe4060566ea6df77c65cc98fa98291c418c9270680e60bfa024`을 그대로 재사용; Windows Registry32/64의 Inno `uninsNNN.exe` 정상 판정, 설치된 R71/R78 0.14.22 GUI/Worker SHA, R179 R26 Ed25519 3개 서명, 5개 배포자료 SHA/크기, R78 신규 Worker와 R96 기존 Worker 바인딩, 0.14.22 기존 Inno 제어 환경 문자열, 미완료 R81 트랜잭션 여부를 확인. 운영 설치/영수증/레지스트리/사용자 데이터 **읽기 전용**.
+- **R180 ZIP:** `HKK_R180_SIGNED_BRIDGE_READONLY_GATE.zip`, SHA256 `abad6cc2f74b9ee30aed9347592e518c1a3e9b568e4ad83a8b57a45388891952`, 61,987 bytes. 테스트 **17/17 PASS (격리)**, ZIP CRC+파일 manifest PASS. **Windows 실행 NOT_TESTED**. 자동 압축해제/검증/실행/영수증 열기 통합 PowerShell 명령과 함께 전달.
+- **중요한 구분:** R180 `R96_ACTUAL_RESTORE_EXECUTION=NOT_TESTED`, `BRIDGE_R26_LAUNCH_AUTHORITY=NOT_IMPLEMENTED`, GUI 버튼→설치→재실행/전원중단 복구 E2E **NOT_TESTED**. 서명 자료와 경로의 정합성을 확인하는 것만으로 실행 권한을 만들지 않음. 기존 구 Worker 서명 검증 우회/대체 금지. 승인 없는 사용자 PC 최초 전환 금지.
+- **향후:** R180 Windows 실증 기록을 토대로 별도 R26 서명된 최초 1회 bridge와 Windows 소유자 GUI 종료, 완전 백업/복구 E2E를 구현. 개발자 PC에서 실증 완료한 뒤 사용자 PC 구 0.14.19 HTTP 415 별도 경로 설계. OPEN.
