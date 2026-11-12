@@ -124,3 +124,13 @@
 - **정확한 안전 한계:** R182 `RestorePermit`은 명시적 synthetic QA fixture이고 **R26 서명 설치 허가 아님**. R178 signed R96 기존 restore `restore_gate='R92_UPGRADE'`와 R180 `CONTROLLER_STRING_ABSENT` 불일치는 운영 실제 전환 전에 추가 확인 필요. R81 정상 GUI 소유권 종료, 전체 백업·트랜잭션/영수증, 실제 signed 0.14.22 Inno 원복, 전원중단/재부팅 복구, 기존 GUI 업데이트 버튼 E2E는 이 시험으로 증명할 수 없음.
 - **R182 패키지:** `HKK_R182_R96_ISOLATED_INNO_RESTORE_QA.zip`, SHA256 `c956723cb1b268271bc0b2d98565e74437c80500b8eb77cadba4a801c8a24dfc`, 62,946 bytes. 허용 파일 5개 + manifest (총 6개), ZIP CRC/파일별 SHA PASS. 새 QA 경로 안전 계약시험 **23/23 PASS (Linux)**. 실제 Windows Inno QA 실행은 **NOT_TESTED**, 사용자 실행 필요. 기존 소스/서명/설치/Google Drive 변경 0. ZIP + 단일 PowerShell 자동 실행 명령과 결과 로그 `Downloads/HKK_R182_LAST.txt` 제공.
 - **재발 방지:** 기존 R181 Windows 통과 이후 반복 빌드/서명 금지; 개발자 QA는 실제 AppId와 무관한 무설치등록 Inno QA로 제한, Python 외부 경로 하드코딩 금지, 예상 예외가 발생해도 원인을 로그에 명시, synthetic PASS ≠ R26 signed production rollback PASS. Issue #3 OPEN 유지.
+
+
+## R182 Windows PASS → R183 signed R92 gate isolated QA (2026-11-12 KST)
+- 사용자 실제 Windows R182 결과: 계약시험 23/23 PASS, 전용 Inno 구·신 설치 PASS, 실제 R96 원본 run_signed_restore() 서브프로세스 원복 PASS, 테스트 사용자 자료 보존 PASS, 변경 SHA 거부 PASS, 원래 앱 SHA 유지 PASS, QA temp cleanup PASS. 실제 서명 0.14.22 setup/재부팅 복구/GUI 버튼 E2E 미검증.
+- 서명 원본 대조: R182 synthetic RestorePermit의 gate=NONE로 QA 성공. 실제 R179 서명 0.14.24 R96 restore_gate=R92_UPGRADE. R180에서 실제 R165_0.14.22.iss에 HKK_R92_CONTROLLER_MODE 문자열 없음(CONTROLLER_STRING_ABSENT). 문자열 부재만으로 컴파일된 실제 installer의 동작을 확정할 수 없음. 실제 production old Inno는 실행하지 않음.
+- R183 신규 실험: 기존 R182_RESTORE_QA.py 및 R176 trust 모듈 바이트 그대로 재사용. 실제 서명된 R96 payload와 old signed Inno SHA/size는 read-only 검증. 랜덤 QA AppId, 전용 TEMP 경로, uninstall registry OFF / lowest privilege로 OLD dummy Inno에 InitializeSetup() GetEnv('HKK_R92_CONTROLLER_MODE') == UPGRADE 게이트를 만들고, 누락 게이트 차단 + synthetic new install + R96 gate NONE 차단 + 원본 R96 gate R92_UPGRADE로 old QA 복원/노트 보존 실증 준비.
+- R183 사전 검증: Linux에서 isolated Python -I -B 23/23 PASS, ZIP CRC/manifest 7 files PASS. 실제 Windows QA 결과 NOT_TESTED. 운영 앱·서명 키·설치/레지스트리/Drive/GitHub Release 변동 없음.
+- R183 ZIP HKK_R183_R92_SIGNED_RESTORE_GATE_QA.zip SHA256 e7329f5c86ef43459bdb99511b4d70683718e15cfb49c3ead1031bf544cc1bbb, 66912 bytes. 한 번의 PowerShell 명령으로 Downloads ZIP SHA→자동 추출→R171/R179/R182 영수증 확인→TEST 23→R183 Windows QA→HKK_R183_LAST.txt 자동 열기.
+- 남은 실제 위험: 실제 0.14.22 Inno restore 게이트/0.14.24 signed production rollback 미검증. R181 독립 브리지는 install authority NOT_GRANTED. R81 crash_recovery_implemented=False; 전원 장애 복구 및 GUI 버튼 E2E 별도 검증 필요. R183 synthetic PASS를 운영 PASS로 오인하면 안 됨.
+- 재발방지: R171 -I 로컬 import 문제 → script sibling import 명시/실제 -I 테스트, R181 Linux /dev/null 문제 → tempfile 사용. Windows MyDocuments+서명 영수증을 통한 프로젝트 단일 선택, 소스 manifest PIN 고정, 기존 R182 코드 재사용.
