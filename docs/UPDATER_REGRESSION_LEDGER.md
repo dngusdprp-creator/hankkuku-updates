@@ -402,3 +402,10 @@
 - **차단 예외 `WorkerBlocked` 출처:** 기존 0.14.26 GUI에 포함된 원본 R79 `hkk_r79_worker.py` `WorkerBlocked(RuntimeError)`, `core.prepare_plan()` 내부에서는 installed root/AppId/registry/R71 또는 R76 current receipt/stage R70/R78 signed plan/no-change 등을 확인. 원본 R81 GUI handoff `adapter.demand` 실패는 별도 `Blocked` 클래스이므로 **WorkerBlocked 표시는 `core.prepare_plan()` 계열 가능성이 높음**. 그러나 정확히 어떤 `require`가 실패했는지는 GUI가 str(exc)를 버려 현재 `알 수 없습니다`. 기존 `R76`과 R71 migration 및 GUI/Worker source 차이를 비교할 필요 있지만 증거 없이 보안게이트 해제하거나 signed files 수정 금지.
 - **이번에는 반복 시험 없이 단발 원인 코드만 확인:** `HKK_01427_HANDOFF_REASON_READONLY.py`(sha256 `d4c8e66903b1bbfc1c924e4b00130f48cbde66bf77a4e0ad0e3c4d0c3a5cb004`, 3811 bytes). 개발자 PC 기존 `_release_candidates/FINAL_01426_USER_ONE_TIME_SIGNED/shadow`에서 GUI R79 source sha `cd1479372564d4148a81d2bbc89df511b3c8fcea85afeddbfa4b51cd031f29c0` 확인 후 원본 `core.prepare_plan(root,stage,'0.14.27', native.registry_entries(), local)` 직접 1회 호출해 **`EXCEPTION_TYPE`+`EXCEPTION_REASON`** 반환. user-root/R71/R76/stage 존재 bool 출력, 프로그램/설치파일/거래 기록/Google Drive/백업/서명/GitHub 원격 변경 0. Python -I -B용 dev crypto venv 실행. Python 컴파일 구문 PASS, **Windows 진단 아직 NOT_TESTED**.
 - **다음 원칙:** 결과가 실패하면 해당 R79/GUI/Worker 원인만 최소 수정하고 0.14.27을 사용자에게 수동 전달하지 않음. Windows 진단 결과 `GUI_PLAN_NOW_PASS`라면 과거 GUI 실행 시점과 상태가 달라진 것이라 lease/race 원인 추가 계측이 필요하며 함부로 auto retry/진단 루프 금지. Debug string을 앱 UI/로컬 기록에 안전하게 노출하는 후속 변경 고려. 0.14.26 고객 마지막 수동 설치 ZIP SHA a1bb... 그대로; R193 완성 백업 재복사 없음; user GUI 최신 패키지 설치 성공은 **NOT_VERIFIED**. Issue #3 OPEN.
+
+## 계정 공통 프로젝트 용어: 성공 브릿지 / 공용브릿지 (2026-11-13 KST)
+- 사용자 확정 정식 명칭 **‘성공 브릿지’** = 현재 SUCCESS 전용 GitHub Bridge (`dngusdprp-creator/success-chat-bridge`). SUCCESS 전용 사용, 기존 프로그램/설정/권한/자동화 일체 유지. 공용 프로젝트 통합 대상에서 제외.
+- 사용자 확정 정식 명칭 **‘공용브릿지’** = SUCCESS **외 모든 개발 프로젝트**(한꾸꾸, AI 메일 도우미, 엑셀 자동가공, 신규 개발 프로젝트)가 함께 사용하는 향후 별도의 비공개 GitHub 기반 명령 전달·PC 허용 작업 실행·검증·결과 자동 보고 체계. 중앙 통합 관리하되 프로젝트별 대기열·허용 권한·실행 환경·로그·실패는 독립.
+- 대화·GitHub 작업 기록·설계 설명에서 위 두 한국어 명칭을 우선 고정 사용. Project Control Bridge 등 임시 제안명은 공식 명칭으로 사용하지 않음.
+- 현재 ‘공용브릿지’는 설계/구축 필요 상태이며 설치·PC 실행·실제 결과 보고 완료로 보고 금지. 성공 브릿지는 건드리지 않는다.
+- 이 GitHub 기록은 계정 전체 ChatGPT 메모리를 직접 수정하지 않으므로 메모리의 실제 자동 반영 여부는 별도 확인 필요.
