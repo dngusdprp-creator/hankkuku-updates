@@ -229,3 +229,11 @@
 - 다음 작업 우선순위: (1) 이미 로컬 R179 R26 signed 0.14.24 및 R181 identity bridge, R189 cold-process QA 재사용 (2) 실제 구 0.14.22 signed Inno와 R96 R92_UPGRADE 불일치에 대한 **최소 변경으로 원복 가능 계약 확립** (3) per-transaction durable single-use authority/owner process fence 및 crash resume supervisor 실제 연결 (4) 개발자 PC GUI 버튼→안전한 업데이트 설치→재실행/실패 복구 E2E, 사용자 데이터 보존 (5) 사용자 PC 0.14.19 GitHub HTTP 415 이슈 최초 이관. 진입점 코드 수정과 QA를 함께 구현하고 실제 운영에 필요하지 않은 QA를 제거.
 - R188 실제 로그온 영수증은 이미 등록된 작업의 결과가 올 때만 해석하고 별도의 신규 QA task를 등록하지 않음. 설치/원복/기존 앱 변경은 여전히 명시적 신뢰검사·백업 완료 전 수행 금지.
 - 성과 기준: 신규 'contract PASS' 개수보다 GUI 인앱 업데이트 E2E 및 rollback/restart success. Issue #3 OPEN 유지.
+
+## R190 Windows PASS 이후 불필요한 검증·패키지 반복 중단 원칙 (2026-11-13 KST)
+- **실제 R190 Windows 상태:** `R190_CONTRACT=PASS_28`, R176/R185/R186 원본 소스 provenance PASS, R81 transaction_count=0, startup_state=NO_TRANSACTION_ROOT, R26 production signature NOT_CREATED, production executor NOT_CONNECTED, install/restore authority NOT_GRANTED, R188 1회 로그온 QA task 유지, 기존 GUI/Worker·사용자 DB·Release unchanged.
+- **사용자 지적:** R185~R190에서 이미 아는 거래 0건/권한 미부여/PASS_READONLY를 여러 번 반복하고, stage-only 패키지와 사용자 명령을 계속 늘렸다. 이 방식은 과도한 검증으로 기능 완성에 기여도가 낮으며 바로 중단한다.
+- **고정 작업 중지:** 동일 데이터·동일 계약의 재검증, R176/185/186/190 전체 회귀시험 재수행, 거래 0건 재측정, 동일 signed R171/R179 파일 재해시, 기능 연결이 없는 신규 `R191_READONLY_*` 또는 `R191_STAGE_ONLY_*` 생성, GitHub 보고만을 위한 패키지 버전 상승을 금지. 기존 PASS 증거는 핀으로 재사용한다. 단 실제 새 변경과 관련된 좁은 회귀 및 install/crash E2E 게이트는 유지.
+- **미완료 단 두 결선 묶음:** (A) 실제 이전 0.14.22 Inno 원복 계약 `restore_gate=R92_UPGRADE`와 기존 R165 소스 의미의 모순을 해소하되 서명 원본을 몰래 고치지 않음. 필요한 경우 R26 새로운 복구 자료 재서명은 실제 안전한 실행기에 필요한 증거가 준비된 후에만. (B) R181 signed identity bridge + R190 transaction-scoped intent + R100 evidence + R96 rollback + R81 durable ownership/nonce 소비 + startup crash recovery executor를 하나의 코드 흐름으로 연결. 기존 0.14.24 후보를 재빌드하지 않고 개발자 PC 보호된 전환 QA로 검증.
+- **다음 사용자에게 제공할 산출물 기준:** 단순 read-only PASS나 단독 classifier가 아니라 **새 기능의 실사용 결선 코드** 및 **개발자 PC에서 0.14.22→0.14.24 GUI 업데이트 버튼/설치/재실행/의도된 실패 원복 E2E**를 실행할 수 있는 통합 패키지. 해당 E2E 전에 시스템을 변경할 필요가 있는 부분만 명시적 사용자 승인을 구하고 백업/원복 계약을 검증. 실패 시 전체 시퀀스 재실행 대신 실패 지점에서 최소 수정.
+- **중요한 안전 유지:** R188 이미 등록된 실제 로그온 1회성 QA는 기존대로 유지하며 새로 등록/재시작하지 않음. 운영 설치/자료 변경은 검증된 백업·원복 및 명시적 승인 범위 외에는 진행 금지. 합성 QA PASS를 생산 E2E PASS로 혼동하지 않음. Issue #3 열린 상태 유지.
